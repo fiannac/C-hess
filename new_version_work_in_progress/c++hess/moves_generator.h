@@ -8,8 +8,11 @@
 
 class MovesGenerator {
 private:
-    std::unordered_map<Bitboard, Bitboard> KNIGHT_PATTERNS;
-    std::unordered_map<Bitboard, Bitboard> KING_PATTERNS;
+    Bitboard KNIGHT_PATTERNS[64];
+    Bitboard KING_PATTERNS[64];
+
+    Bitboard ROOK_MASKS[64];
+    Bitboard BISHOP_MASKS[64];
     //change to const &
     void generatePawnMoves(Game game, std::list<Move> &moves);
     void generateKnightMoves(Game game, std::list<Move> &moves);
@@ -21,6 +24,8 @@ private:
 
     void inizializeKnightPatterns();
     void inizializeKingPatterns();
+    void inizializeRookMasks();
+    void inizializeBishopMasks();
 public:
 
     MovesGenerator();

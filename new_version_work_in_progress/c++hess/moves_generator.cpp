@@ -2,8 +2,26 @@
 #include "chess_types.h"
 #include <iostream>
 
+int getBitIndex(Bitboard bitboard){
+    if(bitboard == 0)
+        return -1;
+    int index = 0;
+    while(bitboard != 1ULL){
+        bitboard = bitboard >> 1;
+        index++;
+    }
+    return index;
+}
+
+void setBit(Bitboard &bitboard, int index){
+    bitboard = bitboard | (1ULL << index);
+}
+
+Bitboard NOT(Bitboard bitboard){
+    return ~bitboard;
+}
+
 std::list<Move> MovesGenerator::generateMoves(Game game){
-    //generate moves from bitboards
     std::list<Move> moves;
     generatePawnMoves(game, moves);
     generateKnightMoves(game, moves);
@@ -18,12 +36,14 @@ std::list<Move> MovesGenerator::generateMoves(Game game){
 MovesGenerator::MovesGenerator(){
     inizializeKnightPatterns();
     inizializeKingPatterns();
+    inizializeRookMasks();
+    inizializeBishopMasks();
 }
 
 void MovesGenerator::inizializeKnightPatterns(){
     Bitboard index = 1ULL;
     for(int i=0;i<64;i++){
-        KNIGHT_PATTERNS[index] = 
+        KNIGHT_PATTERNS[i] = 
             (index & ~FILE_H) >> 17 |
             (index & ~(FILE_G | FILE_H)) >> 10 |
             (index & ~(FILE_G | FILE_H)) << 6 |
@@ -39,7 +59,7 @@ void MovesGenerator::inizializeKnightPatterns(){
 void MovesGenerator::inizializeKingPatterns(){
     Bitboard index = 1ULL;
     for(int i=0;i<64;i++){
-        KING_PATTERNS[index] = 
+        KING_PATTERNS[i] = 
             (index & ~FILE_H) >> 1 |
             (index & ~FILE_H) >> 9 |
             (index & ~RANK_1) >> 8 |
@@ -47,8 +67,69 @@ void MovesGenerator::inizializeKingPatterns(){
             (index & ~FILE_A) << 1 |
             (index & ~FILE_A) << 9 |
             (index & ~RANK_8) << 8 |
-            (index & ~FILE_H)  << 7;
+            (index & ~FILE_H) << 7;
         index <<= 1;
+    }
+}
+
+void MovesGenerator::inizializeRookMasks(){
+    Bitboard files[8];
+    Bitboard ranks[8];
+
+    for(int i=0;i<8;i++){
+        files[i] = 0ULL;
+        ranks[i] = 0ULL;
+    }
+
+    for(int i=0;i<8;i++){
+        if(i==0){
+            files[i] = 0x8080808080808080ULL;
+            ranks[i] = 0xFFULL;
+        } else {
+            files[i] = files[i-1] >> 1;
+            ranks[i] = ranks[i-1] << 8;
+        }
+    }
+
+    for(int i=0;i<64;i++){
+        Bitboard mask = 0ULL;
+        int file = 7 - i % 8;
+        int rank = i / 8;
+    
+        ROOK_MASKS[i] = files[file] | ranks[rank];
+        ROOK_MASKS[i] ^= 1ULL << i;
+    }
+}
+
+void MovesGenerator::inizializeBishopMasks(){
+    for(int i=0;i<64;i++){
+        Bitboard mask = 0ULL;
+        Bitboard index = 1ULL << i;
+        Bitboard indexCopy = index;
+        for(int j = 0; j < 8; j++){
+            mask |= index;
+            index = index & NOT(FILE_H);
+            index = index << 7;
+        }
+        index = 1ULL << i;
+        for(int j = 0; j < 8; j++){
+            mask |= index;
+            index = index & NOT(FILE_A);
+            index = index << 9;
+        }
+        index = 1ULL << i;
+        for(int j = 0; j < 8; j++){
+            mask |= index;
+            index = index & NOT(FILE_A);
+            index = index >> 7;
+        }
+        index = 1ULL << i;
+        for(int j = 0; j < 8; j++){
+            mask |= index;
+            index = index & NOT(FILE_H);
+            index = index >> 9;
+        }
+        BISHOP_MASKS[i] = mask & NOT(indexCopy);
     }
 }
 
@@ -334,7 +415,7 @@ void MovesGenerator::generateKnightMoves(Game game, std::list<Move> &moves){
         while(white_knights){
             
             Bitboard white_knight = white_knights & -white_knights;
-            Bitboard white_knight_moves = this->KNIGHT_PATTERNS[white_knight] & ~game.occupied[WHITE];
+            Bitboard white_knight_moves = this->KNIGHT_PATTERNS[getBitIndex(white_knight)] & ~game.occupied[WHITE];
             while(white_knight_moves){
                 Move move;
                 move.color = WHITE;
@@ -360,7 +441,7 @@ void MovesGenerator::generateKnightMoves(Game game, std::list<Move> &moves){
 
         while(black_knights){
             Bitboard black_knight = black_knights & -black_knights;
-            Bitboard black_knight_moves = this->KNIGHT_PATTERNS[black_knight] & ~game.occupied[BLACK];
+            Bitboard black_knight_moves = this->KNIGHT_PATTERNS[getBitIndex(black_knight)] & ~game.occupied[BLACK];
 
             while(black_knight_moves){
                 Move move;
@@ -388,7 +469,7 @@ void MovesGenerator::generateKingMoves(Game game, std::list<Move> &moves){
     if(game.turn == WHITE){
         std::cout << "White king moves" << std::endl;
         Bitboard white_king = game.pieces[WHITE][KING];
-        Bitboard white_king_moves = this->KING_PATTERNS[white_king] & ~game.occupied[WHITE];
+        Bitboard white_king_moves = this->KING_PATTERNS[getBitIndex(white_king)] & ~game.occupied[WHITE];
         while(white_king_moves){
             Move move;
             move.color = WHITE;
@@ -407,7 +488,7 @@ void MovesGenerator::generateKingMoves(Game game, std::list<Move> &moves){
         }
     } else if(game.turn == BLACK){
         Bitboard black_king = game.pieces[BLACK][KING];
-        Bitboard black_king_moves = this->KING_PATTERNS[black_king] & ~game.occupied[BLACK];
+        Bitboard black_king_moves = this->KING_PATTERNS[getBitIndex(black_king)] & ~game.occupied[BLACK];
         while(black_king_moves){
             Move move;
             move.color = BLACK;

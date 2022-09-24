@@ -167,6 +167,7 @@ std::string Move::to_string() {
     std::string move_string = "";
     
     //from square
+    /*
     if(this->from & FILE_A){
         move_string.append("a");
     } else if(this->from & FILE_B){
@@ -204,7 +205,7 @@ std::string Move::to_string() {
     }
 
     move_string += "-";
-
+    */
 
     if(this->piece_type == KNIGHT){
         move_string += "N";
