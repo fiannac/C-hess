@@ -16,6 +16,12 @@ private:
 
     Bitboard ROOK_MAGIC_NUMBERS[64];
     Bitboard**  rookDB;
+
+    Bitboard BISHOP_MAGIC_NUMBERS[64];
+    Bitboard** bishopDB;
+
+    int ROOK_SHIFT_BITS;
+    int BISHOP_SHIFT_BITS;
     //change to const &
     void generatePawnMoves(const Game& game, std::list<Move> &moves);
     void generateKnightMoves(const Game& game, std::list<Move> &moves);
@@ -31,6 +37,7 @@ private:
     void inizializeBishopMasks();
 
     void setRookMagicBitboard();
+    void setBishopMagicBitboard();
 public:
 
     MovesGenerator();

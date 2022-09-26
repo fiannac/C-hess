@@ -64,7 +64,9 @@ MovesGenerator::MovesGenerator(){
     inizializeKingPatterns();
     inizializeRookMasks();
     inizializeBishopMasks();
+
     setRookMagicBitboard();
+    setBishopMagicBitboard();
 }
 
 void MovesGenerator::inizializeKnightPatterns(){
@@ -545,7 +547,57 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
 }
 
 void MovesGenerator::generateBishopMoves(const Game& game, std::list<Move> &moves){
+    if(game.turn == WHITE){
+        Bitboard white_bishops = game.pieces[WHITE][BISHOP];
+        while(white_bishops){
+            Bitboard white_bishop = white_bishops & -white_bishops;
+            int index = getBitIndex(white_bishop);
 
+            Bitboard white_bishop_moves = bishopDB[index][magicHash(game.all & BISHOP_MASKS[index], BISHOP_MAGIC_NUMBERS[index], BISHOP_SHIFT_BITS)] & ~game.occupied[WHITE];
+            while(white_bishop_moves){
+                Move move;
+                move.color = WHITE;
+                move.piece_type = BISHOP;
+                move.to = white_bishop_moves & -white_bishop_moves;
+                move.from = white_bishop;
+                move.capture = game.occupied[BLACK] & move.to;
+                move.en_passant = false;
+                move.castling = false;
+                move.is_promotion = false;
+
+                if(isLegalMove(game, move)){
+                    moves.push_back(move);
+                }
+                white_bishop_moves &= white_bishop_moves - 1;
+            }
+            white_bishops &= white_bishops - 1;
+        }
+    } else if(game.turn == BLACK){
+        Bitboard black_bishops = game.pieces[BLACK][BISHOP];
+        while(black_bishops){
+            Bitboard black_bishop = black_bishops & -black_bishops;
+            int index = getBitIndex(black_bishop);
+
+            Bitboard black_bishop_moves = bishopDB[index][magicHash(game.all & BISHOP_MASKS[index], BISHOP_MAGIC_NUMBERS[index], BISHOP_SHIFT_BITS)] & ~game.occupied[BLACK];
+            while(black_bishop_moves){
+                Move move;
+                move.color = BLACK;
+                move.piece_type = BISHOP;
+                move.to = black_bishop_moves & -black_bishop_moves;
+                move.from = black_bishop;
+                move.capture = game.occupied[WHITE] & move.to;
+                move.en_passant = false;
+                move.castling = false;
+                move.is_promotion = false;
+
+                if(isLegalMove(game, move)){
+                    moves.push_back(move);
+                }
+                black_bishop_moves &= black_bishop_moves - 1;
+            }
+            black_bishops &= black_bishops - 1;
+        }
+    }
 }
 
 void MovesGenerator::generateRookMoves(const Game& game, std::list<Move> &moves){
@@ -556,8 +608,8 @@ void MovesGenerator::generateRookMoves(const Game& game, std::list<Move> &moves)
             Bitboard white_rook = white_rooks & -white_rooks;
             int index = getBitIndex(white_rook);
 
-            Bitboard white_rook_moves = rookDB[index][magicHash(game.all & ROOK_MASKS[index],ROOK_MAGIC_NUMBERS[index], 12)] & ~game.occupied[WHITE];
-           
+            Bitboard white_rook_moves = rookDB[index][magicHash(game.all & ROOK_MASKS[index],ROOK_MAGIC_NUMBERS[index], ROOK_SHIFT_BITS)] & ~game.occupied[WHITE];
+        
             while(white_rook_moves){
                 Move move;
                 move.color = WHITE;
@@ -582,7 +634,7 @@ void MovesGenerator::generateRookMoves(const Game& game, std::list<Move> &moves)
             Bitboard black_rook = black_rooks & -black_rooks;
             int index = getBitIndex(black_rook);
 
-            Bitboard black_rook_moves = rookDB[index][magicHash(game.all & ROOK_MASKS[index],ROOK_MAGIC_NUMBERS[index], 12)] & ~game.occupied[BLACK];
+            Bitboard black_rook_moves = rookDB[index][magicHash(game.all & ROOK_MASKS[index],ROOK_MAGIC_NUMBERS[index], ROOK_SHIFT_BITS)] & ~game.occupied[BLACK];
             while(black_rook_moves){
                 Move move;
                 move.color = BLACK;
@@ -620,26 +672,26 @@ void MovesGenerator::setRookMagicBitboard(){
     for(int i = 0; i < 64; i++){
         Bitboard mask = ROOK_MASKS[i];
         int num_blockers = 1 << countBits(mask);
-        rook_blockers[i] = std::vector<Bitboard>(num_blockers);
+
+
         for(int j = 0; j < num_blockers; j++){
             Bitboard blockers = 0;
-            int index = j;
+            Bitboard index = j;
             mask = ROOK_MASKS[i];
-            for(int k=0;k < countBits(mask) && index != 0;k++){
+            for(int k=0; k < 64 && index != 0; k++){
                 if(index & 1){
                     blockers |= mask & -mask;
                 }
                 mask &= mask - 1;
                 index >>= 1;
             }
-            rook_blockers[i][j] = blockers;
+            rook_blockers[i].push_back(blockers);
         }
     }
     
     for(int i = 0; i < 64; i++){
         Bitboard pos = 1ULL << i;
         std::vector<Bitboard> blockers = rook_blockers[i];
-        rook_attacks[i].reserve(blockers.size());
         for(int j = 0; j < blockers.size(); j++){
             Bitboard blocker = blockers[j];
             // calculate rooks attacks for this blocker
@@ -672,22 +724,23 @@ void MovesGenerator::setRookMagicBitboard(){
                 attacks |= temp;
                 temp &= NOT(blocker);
             }
-            rook_attacks[i][j] = attacks;
+            rook_attacks[i].push_back(attacks);  
         }
     }
     
-    int s = 12;
-
-    rookDB = new Bitboard*[64]; // 64 squares i = square, index = magicHash(blockers, magic[i], 12)
+    int s = 14;
+    ROOK_SHIFT_BITS = s;
+    rookDB = new Bitboard*[64]; 
     for(int i = 0; i < 64; i++){
         rookDB[i] = new Bitboard[1ULL << s];
+        
     }
 
     // rookDB[i][magicHash(blockers, magic[i], 12)]
 
     for(int i=0;i<64;i++)
         ROOK_MAGIC_NUMBERS[i] = 0ULL;
-    
+            
     for(int i=0;i<64;i++){
         bool ok = false;
         
@@ -704,10 +757,8 @@ void MovesGenerator::setRookMagicBitboard(){
                 if(!used[index]){
                     used[index] = true;
                     rookDB[i][index] = rook_attacks[i][j];
-                } else {
-                    if(rookDB[i][index] != rook_attacks[i][j]){
-                        magic_good = false;
-                    }
+                } else if(rookDB[i][index] != rook_attacks[i][j]){
+                    magic_good = false;
                 }
             }
             if(magic_good){
@@ -717,4 +768,106 @@ void MovesGenerator::setRookMagicBitboard(){
         }
     }  
     
+}
+
+void MovesGenerator::setBishopMagicBitboard(){
+    std::unordered_map<Bitboard, std::vector<Bitboard>> bishop_blockers;
+    std::unordered_map<Bitboard, std::vector<Bitboard>> bishop_attacks;
+
+    for(int i = 0; i < 64; i++){
+        Bitboard mask = BISHOP_MASKS[i];
+        int num_blockers = 1 << countBits(mask);
+
+        for(int j=0; j < num_blockers; j++){
+            Bitboard blockers = 0;
+            Bitboard index = j;
+            mask = BISHOP_MASKS[i];
+            for(int k=0; k < 64 && index != 0; k++){
+                if(index & 1){
+                    blockers |= mask & -mask;
+                }
+                mask &= mask - 1;
+                index >>= 1;
+            }
+            bishop_blockers[i].push_back(blockers);
+        }
+    }
+
+    for(int i = 0; i < 64; i++){
+        Bitboard pos = 1ULL << i;
+        std::vector<Bitboard> blockers = bishop_blockers[i];
+        for(int j = 0; j < blockers.size(); j++){
+            Bitboard blocker = blockers[j];
+            // calculate bishops attacks for this blocker
+            Bitboard attacks = 0;
+            Bitboard temp = pos;
+            while(temp){
+                temp &= NOT(FILE_H);
+                temp <<= 7;
+                attacks |= temp;
+                temp &= NOT(blocker);
+            }
+            temp = pos;
+            while(temp){
+                temp &= NOT(FILE_A);
+                temp <<= 9;
+                attacks |= temp;
+                temp &= NOT(blocker);
+            }
+            temp = pos;
+            while(temp){
+                temp &= NOT(FILE_H);
+                temp >>= 9;
+                attacks |= temp;
+                temp &= NOT(blocker);
+            }
+            temp = pos;
+            while(temp){
+                temp &= NOT(FILE_A);
+                temp >>= 7;
+                attacks |= temp;
+                temp &= NOT(blocker);
+            }
+            bishop_attacks[i].push_back(attacks);  
+        }
+    }
+
+    int s = 13;
+    BISHOP_SHIFT_BITS = s;
+    bishopDB = new Bitboard*[64];
+    for(int i = 0; i < 64; i++){
+        bishopDB[i] = new Bitboard[1ULL << s];
+    }
+
+    // bishopDB[i][magicHash(blockers, magic[i], 9)]
+
+    for(int i=0;i<64;i++)
+        BISHOP_MAGIC_NUMBERS[i] = 0ULL;
+
+    for(int i=0;i<64;i++){
+        bool ok = false;
+
+        while(!ok){
+            Bitboard magic = randomU64();
+            bool* used = new bool[1ULL << s];
+            for(int j=0;j<(1ULL << s);j++){
+                used[j] = false;
+            } 
+            std::vector<Bitboard> blockers = bishop_blockers[i];
+            bool magic_good = true;
+            for(int j=0;j<blockers.size() && magic_good == true;j++){
+                int index = magicHash(blockers[j], magic, s);
+                if(!used[index]){
+                    used[index] = true;
+                    bishopDB[i][index] = bishop_attacks[i][j];
+                } else if(bishopDB[i][index] != bishop_attacks[i][j]){
+                    magic_good = false;
+                }
+            }
+            if(magic_good){
+                ok = true;
+                BISHOP_MAGIC_NUMBERS[i] = magic;
+            }
+        }
+    }
 }
