@@ -5,7 +5,7 @@
 #include <string>
 
 int main(){
-    Game game("1B6/2P5/8/8/3K4/8/8/8 w - - 0 1");
+    Game game("1Qp5/2P5/8/8/3K4/8/8/8 w - - 0 1");
     MovesGenerator moves_generator;
     std::cout << game.to_string() << std::endl;
     try{
