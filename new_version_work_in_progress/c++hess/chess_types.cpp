@@ -2,6 +2,26 @@
 #include <string>
 #include <iostream>
 
+int getBitIndex(Bitboard bitboard){
+    if(bitboard == 0)
+        return -1;
+    int index = 0;
+    while(bitboard != 1ULL){
+        bitboard = bitboard >> 1;
+        index++;
+    }
+    return index;
+}
+
+inline void setBit(Bitboard &bitboard, int index){
+    bitboard = bitboard | (1ULL << index);
+}
+
+inline Bitboard NOT(Bitboard bitboard){
+    return ~bitboard;
+}
+
+
 Game::Game(std::string fen) {
     Bitboard pos = 0x8000000000000000;
     int i = 0;
@@ -112,8 +132,103 @@ Game::Game(std::string fen) {
 
 }
 
-void Game::make_move(Move move) {
-    
+void Game::make_move(const Move& move) {
+    if(turn == WHITE) {
+        turn = BLACK;
+    } else {
+        turn = WHITE;
+    }
+
+    PieceType piece_type = move.piece_type;
+    Color piece_color = move.color;
+    Bitboard from = move.from;
+    Bitboard to = move.to;
+
+    pieces[piece_color][piece_type] &= NOT(from);
+    pieces[piece_color][piece_type] |= to;
+
+    occupied[piece_color] &= NOT(from);
+    occupied[piece_color] |= to;
+
+    all &= NOT(from);
+    all |= to;
+
+    if (move.capture) {
+        Color capture_color = (piece_color == WHITE) ? BLACK : WHITE;
+        for(int i = 0; i < 6; i++) {
+            if(pieces[capture_color][i] & to) {
+                pieces[capture_color][i] &= NOT(to);
+                occupied[capture_color] &= NOT(to);
+                all &= NOT(to);
+                break;
+            }
+        }
+    }
+
+    if (move.promotion) {
+        pieces[piece_color][piece_type] &= NOT(to);
+        pieces[piece_color][move.promotion] |= to;
+    }
+
+    if(move.pawn_double_push){
+        if(piece_color == WHITE){
+            en_passant = to >> 8;
+        } else {
+            en_passant = to << 8;
+        }
+        en_passant_possible = true;
+    } else {
+        en_passant = 0;
+        en_passant_possible = false;
+    }
+
+    if(move.castling){
+        if(to == 1ULL << G1){
+            pieces[WHITE][ROOK] &= NOT(1ULL << H1);
+            pieces[WHITE][ROOK] |= 1ULL << F1;
+        } else if( to == 1ULL << C1){
+            pieces[WHITE][ROOK] &= NOT(1ULL << A1);
+            pieces[WHITE][ROOK] |= 1ULL << D1;
+        } else if( to == 1ULL << G8){
+            pieces[BLACK][ROOK] &= NOT(1ULL << H8);
+            pieces[BLACK][ROOK] |= 1ULL << F8;
+        } else if( to == 1ULL << C8){
+            pieces[BLACK][ROOK] &= NOT(1ULL << A8);
+            pieces[BLACK][ROOK] |= 1ULL << D8;
+        }
+    }
+
+    if(move.piece_type == KING){
+        if(piece_color == WHITE){
+            white_can_castle_kingside = false;
+            white_can_castle_queenside = false;
+        } else {
+            black_can_castle_kingside = false;
+            black_can_castle_queenside = false;
+        }
+    } else if(move.piece_type == ROOK){
+        if(piece_color == WHITE){
+            if(from == 1ULL << H1){
+                white_can_castle_kingside = false;
+            } else if(from == 1ULL << A1){
+                white_can_castle_queenside = false;
+            }
+        } else {
+            if(from == 1ULL << H8){
+                black_can_castle_kingside = false;
+            } else if(from == 1ULL << A8){
+                black_can_castle_queenside = false;
+            }
+        }
+    }
+
+    if(move.piece_type != PAWN && !move.capture){
+        halfmove_clock++;
+    } else {
+        halfmove_clock = 0;
+    }
+
+    fullmove_number ++;
 }
 
 std::string Game::to_string() {

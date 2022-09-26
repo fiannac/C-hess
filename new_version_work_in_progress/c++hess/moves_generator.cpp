@@ -215,6 +215,7 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
             move.en_passant = false;
             move.castling = false;
             move.is_promotion = false;
+            move.pawn_double_push = true;
 
             if(isLegalMove(game, move)){
                 moves.push_back(move);
@@ -349,6 +350,7 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
             move.en_passant = false;
             move.castling = false;
             move.is_promotion = false;
+            move.pawn_double_push = true;
 
             if(isLegalMove(game, move)){
                 moves.push_back(move);
@@ -522,6 +524,39 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
             }
             white_king_moves &= white_king_moves - 1;
         }
+
+        if(game.white_can_castle_kingside && (!game.all & (1ULL << F1 | 1ULL << G1))){
+            Move move;
+            move.color = WHITE;
+            move.piece_type = KING;
+            move.to = 1ULL << G1;
+            move.from = 1ULL << E1;
+            move.capture = false;
+            move.en_passant = false;
+            move.castling = true;
+            move.is_promotion = false;
+
+            if(isLegalMove(game, move)){
+                moves.push_back(move);
+            }
+        }
+
+        if(game.white_can_castle_queenside && (!game.all & (1ULL << B1 | 1ULL << C1 | 1ULL << D1))){
+            Move move;
+            move.color = WHITE;
+            move.piece_type = KING;
+            move.to = 1ULL << C1;
+            move.from = 1ULL << E1;
+            move.capture = false;
+            move.en_passant = false;
+            move.castling = true;
+            move.is_promotion = false;
+
+            if(isLegalMove(game, move)){
+                moves.push_back(move);
+            }
+        }
+
     } else if(game.turn == BLACK){
         Bitboard black_king = game.pieces[BLACK][KING];
         Bitboard black_king_moves = this->KING_PATTERNS[getBitIndex(black_king)] & ~game.occupied[BLACK];
@@ -540,6 +575,38 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
                 moves.push_back(move);
             }
             black_king_moves &= black_king_moves - 1;
+        }
+
+        if(game.black_can_castle_kingside && (!game.all & (1ULL << F8 | 1ULL << G8))){
+            Move move;
+            move.color = BLACK;
+            move.piece_type = KING;
+            move.to = 1ULL << G8;
+            move.from = 1ULL << E8;
+            move.capture = false;
+            move.en_passant = false;
+            move.castling = true;
+            move.is_promotion = false;
+
+            if(isLegalMove(game, move)){
+                moves.push_back(move);
+            }
+        }
+
+        if(game.black_can_castle_queenside && (!game.all & (1ULL << B8 | 1ULL << C8 | 1ULL << D8))){
+            Move move;
+            move.color = BLACK;
+            move.piece_type = KING;
+            move.to = 1ULL << C8;
+            move.from = 1ULL << E8;
+            move.capture = false;
+            move.en_passant = false;
+            move.castling = true;
+            move.is_promotion = false;
+
+            if(isLegalMove(game, move)){
+                moves.push_back(move);
+            }
         }
     }
 }
