@@ -13,23 +13,28 @@ private:
 
     Bitboard ROOK_MASKS[64];
     Bitboard BISHOP_MASKS[64];
+
+    Bitboard ROOK_MAGIC_NUMBERS[64];
+    Bitboard**  rookDB;
     //change to const &
-    void generatePawnMoves(Game game, std::list<Move> &moves);
-    void generateKnightMoves(Game game, std::list<Move> &moves);
-    void generateBishopMoves(Game game, std::list<Move> &moves);
-    void generateRookMoves(Game game, std::list<Move> &moves);
-    void generateQueenMoves(Game game, std::list<Move> &moves);
-    void generateKingMoves(Game game, std::list<Move> &moves);
-    bool isLegalMove(Game game, Move move);
+    void generatePawnMoves(const Game& game, std::list<Move> &moves);
+    void generateKnightMoves(const Game& game, std::list<Move> &moves);
+    void generateBishopMoves(const Game& game, std::list<Move> &moves);
+    void generateRookMoves(const Game& game, std::list<Move> &moves);
+    void generateQueenMoves(const Game& game, std::list<Move> &moves);
+    void generateKingMoves(const Game& game, std::list<Move> &moves);
+    bool isLegalMove(const Game& game, Move move);
 
     void inizializeKnightPatterns();
     void inizializeKingPatterns();
     void inizializeRookMasks();
     void inizializeBishopMasks();
+
+    void setRookMagicBitboard();
 public:
 
     MovesGenerator();
-    std::list<Move> generateMoves(Game game);
+    std::list<Move> generateMoves(const Game& game);
 };
 
 

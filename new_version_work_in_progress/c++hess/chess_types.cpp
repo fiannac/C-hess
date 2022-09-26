@@ -294,7 +294,7 @@ std::string Move::to_string() {
     }
 
     if(this->check){
-        move_string += "+";
+       // move_string += "+";
     }
 
     return move_string;
