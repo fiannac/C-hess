@@ -176,10 +176,10 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
         Bitboard white_pawns = game.pieces[WHITE][PAWN];
         Bitboard white_pawns_steps = (white_pawns << 8) &  ~game.all;
         Bitboard white_pawns_double_steps = ((white_pawns_steps & RANK_3) << 8) & ~game.all;
-        Bitboard white_pawns_attacks_left = ((white_pawns & ~FILE_A) << 7) & game.occupied[BLACK];
-        Bitboard white_pawns_attacks_right = ((white_pawns & ~FILE_H) << 9) & game.occupied[BLACK];
-        Bitboard white_pawns_en_passant_left = ((white_pawns & ~FILE_A) << 7) & game.en_passant;
-        Bitboard white_pawns_en_passant_right = ((white_pawns & ~FILE_H) << 9) & game.en_passant;
+        Bitboard white_pawns_attacks_left = ((white_pawns & ~FILE_H) << 7) & game.occupied[BLACK];
+        Bitboard white_pawns_attacks_right = ((white_pawns & ~FILE_A) << 9) & game.occupied[BLACK];
+        Bitboard white_pawns_en_passant_left = ((white_pawns & ~FILE_H) << 7) & game.en_passant;
+        Bitboard white_pawns_en_passant_right = ((white_pawns & ~FILE_A) << 9) & game.en_passant;
 
         while(white_pawns_steps){
             Move move;
@@ -311,10 +311,10 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
         Bitboard black_pawns = game.pieces[BLACK][PAWN];
         Bitboard black_pawns_steps = (black_pawns >> 8) & ~game.all;
         Bitboard black_pawns_double_steps = ((black_pawns_steps & RANK_6) >> 8) & ~game.all;
-        Bitboard black_pawns_attacks_left = ((black_pawns & ~FILE_A) >> 9) & game.occupied[WHITE];
-        Bitboard black_pawns_attacks_right = ((black_pawns & ~FILE_H) >> 7) & game.occupied[WHITE];
-        Bitboard black_pawns_en_passant_left = ((black_pawns & ~FILE_A) >> 9) & game.en_passant;
-        Bitboard black_pawns_en_passant_right = ((black_pawns & ~FILE_H) >> 7) & game.en_passant;
+        Bitboard black_pawns_attacks_left = ((black_pawns & ~FILE_H) >> 9) & game.occupied[WHITE];
+        Bitboard black_pawns_attacks_right = ((black_pawns & ~FILE_A) >> 7) & game.occupied[WHITE];
+        Bitboard black_pawns_en_passant_left = ((black_pawns & ~FILE_H) >> 9) & game.en_passant;
+        Bitboard black_pawns_en_passant_right = ((black_pawns & ~FILE_A) >> 7) & game.en_passant;
 
         while(black_pawns_steps){
             Move move;
@@ -730,8 +730,8 @@ void MovesGenerator::generateQueenMoves(const Game& game, std::list<Move> &moves
             int index = getBitIndex(white_queen);
             
             Bitboard white_queen_moves = 
-                rookDB[index][magicHash(game.all & ROOK_MASKS[index], ROOK_MAGIC_NUMBERS[index], ROOK_SHIFT_BITS)] |
-                bishopDB[index][magicHash(game.all & BISHOP_MASKS[index], BISHOP_MAGIC_NUMBERS[index], BISHOP_SHIFT_BITS)] & 
+                (rookDB[index][magicHash(game.all & ROOK_MASKS[index], ROOK_MAGIC_NUMBERS[index], ROOK_SHIFT_BITS)] |
+                bishopDB[index][magicHash(game.all & BISHOP_MASKS[index], BISHOP_MAGIC_NUMBERS[index], BISHOP_SHIFT_BITS)]) & 
                 ~game.occupied[WHITE];
 
             while(white_queen_moves){
@@ -759,8 +759,8 @@ void MovesGenerator::generateQueenMoves(const Game& game, std::list<Move> &moves
             int index = getBitIndex(black_queen);
 
             Bitboard black_queen_moves = 
-                rookDB[index][magicHash(game.all & ROOK_MASKS[index], ROOK_MAGIC_NUMBERS[index], ROOK_SHIFT_BITS)] |
-                bishopDB[index][magicHash(game.all & BISHOP_MASKS[index], BISHOP_MAGIC_NUMBERS[index], BISHOP_SHIFT_BITS)] & 
+                (rookDB[index][magicHash(game.all & ROOK_MASKS[index], ROOK_MAGIC_NUMBERS[index], ROOK_SHIFT_BITS)] |
+                bishopDB[index][magicHash(game.all & BISHOP_MASKS[index], BISHOP_MAGIC_NUMBERS[index], BISHOP_SHIFT_BITS)]) & 
                 ~game.occupied[BLACK];
 
             while(black_queen_moves){

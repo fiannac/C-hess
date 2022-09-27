@@ -2,25 +2,6 @@
 #include <string>
 #include <iostream>
 
-int getBitIndex(Bitboard bitboard){
-    if(bitboard == 0)
-        return -1;
-    int index = 0;
-    while(bitboard != 1ULL){
-        bitboard = bitboard >> 1;
-        index++;
-    }
-    return index;
-}
-
-inline void setBit(Bitboard &bitboard, int index){
-    bitboard = bitboard | (1ULL << index);
-}
-
-inline Bitboard NOT(Bitboard bitboard){
-    return ~bitboard;
-}
-
 
 Game::Game(std::string fen) {
     Bitboard pos = 0x8000000000000000;
@@ -144,29 +125,32 @@ void Game::make_move(const Move& move) {
     Bitboard from = move.from;
     Bitboard to = move.to;
 
-    pieces[piece_color][piece_type] &= NOT(from);
+    
+
+    pieces[piece_color][piece_type] &= ~(from);
     pieces[piece_color][piece_type] |= to;
 
-    occupied[piece_color] &= NOT(from);
+    occupied[piece_color] &= ~(from);
     occupied[piece_color] |= to;
 
-    all &= NOT(from);
+    all &= ~(from);
     all |= to;
 
+    
     if (move.capture) {
         Color capture_color = (piece_color == WHITE) ? BLACK : WHITE;
         for(int i = 0; i < 6; i++) {
             if(pieces[capture_color][i] & to) {
-                pieces[capture_color][i] &= NOT(to);
-                occupied[capture_color] &= NOT(to);
-                all &= NOT(to);
+                pieces[capture_color][i] &= ~(to);
+                occupied[capture_color] &= ~(to);
+                all &= ~(to);
                 break;
             }
         }
     }
 
-    if (move.promotion) {
-        pieces[piece_color][piece_type] &= NOT(to);
+    if (move.is_promotion) {
+        pieces[piece_color][piece_type] &= ~(to);
         pieces[piece_color][move.promotion] |= to;
     }
 
@@ -184,16 +168,16 @@ void Game::make_move(const Move& move) {
 
     if(move.castling){
         if(to == 1ULL << G1){
-            pieces[WHITE][ROOK] &= NOT(1ULL << H1);
+            pieces[WHITE][ROOK] &= ~(1ULL << H1);
             pieces[WHITE][ROOK] |= 1ULL << F1;
         } else if( to == 1ULL << C1){
-            pieces[WHITE][ROOK] &= NOT(1ULL << A1);
+            pieces[WHITE][ROOK] &= ~(1ULL << A1);
             pieces[WHITE][ROOK] |= 1ULL << D1;
         } else if( to == 1ULL << G8){
-            pieces[BLACK][ROOK] &= NOT(1ULL << H8);
+            pieces[BLACK][ROOK] &= ~(1ULL << H8);
             pieces[BLACK][ROOK] |= 1ULL << F8;
         } else if( to == 1ULL << C8){
-            pieces[BLACK][ROOK] &= NOT(1ULL << A8);
+            pieces[BLACK][ROOK] &= ~(1ULL << A8);
             pieces[BLACK][ROOK] |= 1ULL << D8;
         }
     }
@@ -229,6 +213,7 @@ void Game::make_move(const Move& move) {
     }
 
     fullmove_number ++;
+
 }
 
 std::string Game::to_string() {
@@ -320,7 +305,7 @@ std::string Move::to_string() {
     }
 
     move_string += "-";
-    */
+    */    
 
     if(this->piece_type == KNIGHT){
         move_string += "N";
@@ -414,4 +399,3 @@ std::string Move::to_string() {
 
     return move_string;
 }
-

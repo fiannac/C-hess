@@ -5,19 +5,28 @@
 #include <string>
 
 int main(){
-    Game game("1Qp5/2P5/8/8/3K4/8/8/8 w - - 0 1");
-    MovesGenerator moves_generator;
+    Game game("rnbkqbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR w - - 0 1");
     std::cout << game.to_string() << std::endl;
-    try{
+    MovesGenerator moves_generator;
+
+    for(int i=0;i<10;i++){
+        
         std::list<Move> moves = moves_generator.generateMoves(game);
+        if(game.turn == WHITE){
+            std::cout << "White!" << std::endl;
+        } else {
+            std::cout << "Black!" << std::endl;
+        }
         for (Move move : moves) {
             std::cout << move.to_string() << std::endl;
         }
-    }
-    catch (const std::exception& e) {
-        std::cout << e.what() << std::endl;
+        game.make_move(*moves.begin());
+        std::cout << std::endl;
+        std::cout << "Move made: " << (*moves.begin()).to_string() << std::endl;
+        std::cout << game.to_string() << std::endl;
     }
 
     while(1);
     return 0;
 }
+
