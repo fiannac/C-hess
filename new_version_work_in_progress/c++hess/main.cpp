@@ -5,23 +5,26 @@
 #include <string>
 
 int main(){
-    Game game("rnbkqbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBKQBNR w - - 0 1");
+    Game game("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1");
     std::cout << game.to_string() << std::endl;
     MovesGenerator moves_generator;
 
     for(int i=0;i<10;i++){
         
         std::list<Move> moves = moves_generator.generateMoves(game);
-        if(game.turn == WHITE){
-            std::cout << "White!" << std::endl;
-        } else {
-            std::cout << "Black!" << std::endl;
-        }
+    
+        int num = 0;
         for (Move move : moves) {
-            std::cout << move.to_string() << std::endl;
+            std::cout << num << ") " << move.to_string() << std::endl;
+            num++;
         }
-        game.make_move(*moves.begin());
+        int to_do;
+        std::cout << "Inserisci mossa: ";
+        std::cin >> to_do;
         std::cout << std::endl;
+        auto pointer = moves.begin();
+        std::advance(pointer, to_do);
+        game.make_move(*pointer);
         std::cout << "Move made: " << (*moves.begin()).to_string() << std::endl;
         std::cout << game.to_string() << std::endl;
     }

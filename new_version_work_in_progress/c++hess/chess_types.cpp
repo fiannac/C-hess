@@ -149,6 +149,13 @@ void Game::make_move(const Move& move) {
         }
     }
 
+    if (move.en_passant){
+        if(piece_color == WHITE)
+            pieces[BLACK][PAWN] &= ~(to >> 8);
+        else if(piece_color == BLACK)
+            pieces[WHITE][PAWN] &= ~(to << 8);
+    }
+
     if (move.is_promotion) {
         pieces[piece_color][piece_type] &= ~(to);
         pieces[piece_color][move.promotion] |= to;
@@ -306,6 +313,15 @@ std::string Move::to_string() {
 
     move_string += "-";
     */    
+
+   if(castling){
+    if(to == 1ULL << G1 || to == 1ULL << G8){
+        move_string += "O-O";
+    } else {
+        move_string += "O-O-O";
+    }
+    return move_string;
+   }
 
     if(this->piece_type == KNIGHT){
         move_string += "N";

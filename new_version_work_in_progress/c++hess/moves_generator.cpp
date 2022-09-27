@@ -525,7 +525,7 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
             white_king_moves &= white_king_moves - 1;
         }
 
-        if(game.white_can_castle_kingside && (!game.all & (1ULL << F1 | 1ULL << G1))){
+        if(game.white_can_castle_kingside && (game.all & (1ULL << F1 | 1ULL << G1)) == 0ULL){
             Move move;
             move.color = WHITE;
             move.piece_type = KING;
@@ -539,9 +539,9 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
             if(isLegalMove(game, move)){
                 moves.push_back(move);
             }
-        }
+        } 
 
-        if(game.white_can_castle_queenside && (!game.all & (1ULL << B1 | 1ULL << C1 | 1ULL << D1))){
+        if(game.white_can_castle_queenside && (game.all & (1ULL << B1 | 1ULL << C1 | 1ULL << D1)) == 0ULL){
             Move move;
             move.color = WHITE;
             move.piece_type = KING;
@@ -577,7 +577,7 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
             black_king_moves &= black_king_moves - 1;
         }
 
-        if(game.black_can_castle_kingside && (!game.all & (1ULL << F8 | 1ULL << G8))){
+        if(game.black_can_castle_kingside && (game.all & (1ULL << F8 | 1ULL << G8)) == 0ULL){
             Move move;
             move.color = BLACK;
             move.piece_type = KING;
@@ -593,7 +593,7 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
             }
         }
 
-        if(game.black_can_castle_queenside && (!game.all & (1ULL << B8 | 1ULL << C8 | 1ULL << D8))){
+        if(game.black_can_castle_queenside && (game.all & (1ULL << B8 | 1ULL << C8 | 1ULL << D8)) == 0ULL){
             Move move;
             move.color = BLACK;
             move.piece_type = KING;
