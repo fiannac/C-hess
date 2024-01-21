@@ -171,283 +171,6 @@ void MovesGenerator::inizializeBishopMasks(){
     }
 }
 
-void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves){
-    if(game.turn == WHITE){
-        //generate white pawn moves
-        Bitboard white_pawns = game.pieces[WHITE][PAWN];
-        Bitboard white_pawns_steps = (white_pawns << 8) &  ~game.all;
-        Bitboard white_pawns_double_steps = ((white_pawns_steps & RANK_3) << 8) & ~game.all;
-        Bitboard white_pawns_attacks_left = ((white_pawns & ~FILE_H) << 7) & game.occupied[BLACK];
-        Bitboard white_pawns_attacks_right = ((white_pawns & ~FILE_A) << 9) & game.occupied[BLACK];
-        Bitboard white_pawns_en_passant_left = ((white_pawns & ~FILE_H) << 7) & game.en_passant;
-        Bitboard white_pawns_en_passant_right = ((white_pawns & ~FILE_A) << 9) & game.en_passant;
-
-        while(white_pawns_steps){
-            Move move;
-            move.color = WHITE;
-            move.piece_type = PAWN;
-            move.to = white_pawns_steps & -white_pawns_steps;
-            move.from = move.to >> 8;
-            move.capture = false;
-            move.en_passant = false;
-            move.castling = false;
-            if(move.to & RANK_8){
-                move.is_promotion = true;
-                move.promotion = QUEEN;
-            }
-            else{
-                move.is_promotion = false;
-            }
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-
-            white_pawns_steps &= white_pawns_steps - 1;
-        }
-
-        while(white_pawns_double_steps){
-            Move move;
-            move.color = WHITE;
-            move.piece_type = PAWN;
-            move.to = white_pawns_double_steps & -white_pawns_double_steps;
-            move.from = move.to >> 16;
-            move.capture = false;
-            move.en_passant = false;
-            move.castling = false;
-            move.is_promotion = false;
-            move.pawn_double_push = true;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-
-            white_pawns_double_steps &= white_pawns_double_steps - 1;
-        }
-
-        while(white_pawns_attacks_left){
-            Move move;
-            move.color = WHITE;
-            move.piece_type = PAWN;
-            move.to = white_pawns_attacks_left & -white_pawns_attacks_left;
-            move.from = move.to >> 7;
-            move.capture = true;
-            move.en_passant = false;
-            move.castling = false;
-            if(move.to & RANK_8){
-                move.is_promotion = true;
-                move.promotion = QUEEN;
-            }
-            else{
-                move.is_promotion = false;
-            }
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-
-            white_pawns_attacks_left &= white_pawns_attacks_left - 1;
-        }
-
-        while(white_pawns_attacks_right){
-            Move move;
-            move.color = WHITE;
-            move.piece_type = PAWN;
-            move.to = white_pawns_attacks_right & -white_pawns_attacks_right;
-            move.from = move.to >> 9;
-            move.capture = true;
-            move.en_passant = false;
-            move.castling = false;
-            if(move.to & RANK_8){
-                move.is_promotion = true;
-                move.promotion = QUEEN;
-            }
-            else{
-                move.is_promotion = false;
-            }
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-
-            white_pawns_attacks_right &= white_pawns_attacks_right - 1;
-        }
-
-        //en passant when you will set that be carefull!
-
-        if(white_pawns_en_passant_left){
-            Move move;
-            move.color = WHITE;
-            move.piece_type = PAWN;
-            move.to = white_pawns_en_passant_left & -white_pawns_en_passant_left;
-            move.from = move.to >> 7;
-            move.capture = true;
-            move.en_passant = true;
-            move.castling = false;
-            move.is_promotion = false;
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-        }
-
-        if(white_pawns_en_passant_right){
-            Move move;
-            move.color = WHITE;
-            move.piece_type = PAWN;
-            move.to = white_pawns_en_passant_right & -white_pawns_en_passant_right;
-            move.from = move.to >> 9;
-            move.capture = true;
-            move.en_passant = true;
-            move.castling = false;
-            move.is_promotion = false;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-        }
-
-        
-    } else if(game.turn == BLACK){ 
-        //generate black pawn moves
-        Bitboard black_pawns = game.pieces[BLACK][PAWN];
-        Bitboard black_pawns_steps = (black_pawns >> 8) & ~game.all;
-        Bitboard black_pawns_double_steps = ((black_pawns_steps & RANK_6) >> 8) & ~game.all;
-        Bitboard black_pawns_attacks_left = ((black_pawns & ~FILE_H) >> 9) & game.occupied[WHITE];
-        Bitboard black_pawns_attacks_right = ((black_pawns & ~FILE_A) >> 7) & game.occupied[WHITE];
-        Bitboard black_pawns_en_passant_left = ((black_pawns & ~FILE_H) >> 9) & game.en_passant;
-        Bitboard black_pawns_en_passant_right = ((black_pawns & ~FILE_A) >> 7) & game.en_passant;
-
-        while(black_pawns_steps){
-            Move move;
-            move.color = BLACK;
-            move.piece_type = PAWN;
-            move.to = black_pawns_steps & -black_pawns_steps;
-            move.from = move.to << 8;
-            move.capture = false;
-            move.en_passant = false;
-            move.castling = false;
-            if(move.to & RANK_1){
-                move.is_promotion = true;
-                move.promotion = QUEEN;
-            }
-            else{
-                move.is_promotion = false;
-            }
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-
-            black_pawns_steps &= black_pawns_steps - 1;
-        }
-
-        while(black_pawns_double_steps){
-            Move move;
-            move.color = BLACK;
-            move.piece_type = PAWN;
-            move.to = black_pawns_double_steps & -black_pawns_double_steps;
-            move.from = move.to << 16;
-            move.capture = false;
-            move.en_passant = false;
-            move.castling = false;
-            move.is_promotion = false;
-            move.pawn_double_push = true;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-
-            black_pawns_double_steps &= black_pawns_double_steps - 1;
-        }
-
-        while(black_pawns_attacks_left){
-            Move move;
-            move.color = BLACK;
-            move.piece_type = PAWN;
-            move.to = black_pawns_attacks_left & -black_pawns_attacks_left;
-            move.from = move.to << 9;
-            move.capture = true;
-            move.en_passant = false;
-            move.castling = false;
-            if(move.to & RANK_1){
-                move.is_promotion = true;
-                move.promotion = QUEEN;
-            }
-            else{
-                move.is_promotion = false;
-            }
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-
-            black_pawns_attacks_left &= black_pawns_attacks_left - 1;
-        }
-
-        while(black_pawns_attacks_right){
-            Move move;
-            move.color = BLACK;
-            move.piece_type = PAWN;
-            move.to = black_pawns_attacks_right & -black_pawns_attacks_right;
-            move.from = move.to << 7;
-            move.capture = true;
-            move.en_passant = false;
-            move.castling = false;
-            if(move.to & RANK_1){
-                move.is_promotion = true;
-                move.promotion = QUEEN;
-            }
-            else{
-                move.is_promotion = false;
-            }
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-
-            black_pawns_attacks_right &= black_pawns_attacks_right - 1;
-        }
-
-        if(black_pawns_en_passant_left){
-            Move move;
-            move.color = BLACK;
-            move.piece_type = PAWN;
-            move.to = black_pawns_en_passant_left & -black_pawns_en_passant_left;
-            move.from = move.to << 7;
-            move.capture = true;
-            move.en_passant = true;
-            move.castling = false;
-            move.is_promotion = false;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-
-            black_pawns_en_passant_left &= black_pawns_en_passant_left - 1;
-        }
-
-        if(black_pawns_en_passant_right){
-            Move move;
-            move.color = BLACK;
-            move.piece_type = PAWN;
-            move.to = black_pawns_en_passant_right & -black_pawns_en_passant_right;
-            move.from = move.to << 9;
-            move.capture = true;
-            move.en_passant = true;
-            move.castling = false;
-            move.is_promotion = false;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-
-            black_pawns_en_passant_right &= black_pawns_en_passant_right - 1;
-        }
-
-
-    }
-}
-
 void MovesGenerator::generateKnightMoves(const Game& game, std::list<Move> &moves){
     
     if(game.turn == WHITE){
@@ -506,7 +229,7 @@ void MovesGenerator::generateKnightMoves(const Game& game, std::list<Move> &move
 }
 
 void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves){
-    if(game.turn == WHITE){
+        if(game.turn == WHITE){
         Bitboard white_king = game.pieces[WHITE][KING];
         Bitboard white_king_moves = this->KING_PATTERNS[getBitIndex(white_king)] & ~game.occupied[WHITE];
         while(white_king_moves){
@@ -613,7 +336,7 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
 }
 
 void MovesGenerator::generateBishopMoves(const Game& game, std::list<Move> &moves){
-    if(game.turn == WHITE){
+        if(game.turn == WHITE){
         Bitboard white_bishops = game.pieces[WHITE][BISHOP];
         while(white_bishops){
             Bitboard white_bishop = white_bishops & -white_bishops;
@@ -667,7 +390,7 @@ void MovesGenerator::generateBishopMoves(const Game& game, std::list<Move> &move
 }
 
 void MovesGenerator::generateRookMoves(const Game& game, std::list<Move> &moves){
-
+    
     if(game.turn == WHITE){
         Bitboard white_rooks = game.pieces[WHITE][ROOK];
         while(white_rooks){
@@ -724,7 +447,7 @@ void MovesGenerator::generateRookMoves(const Game& game, std::list<Move> &moves)
 }
 
 void MovesGenerator::generateQueenMoves(const Game& game, std::list<Move> &moves){
-    if(game.turn == WHITE){
+        if(game.turn == WHITE){
         Bitboard white_queens = game.pieces[WHITE][QUEEN];
         while(white_queens){
             Bitboard white_queen = white_queens & -white_queens;

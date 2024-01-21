@@ -50,19 +50,27 @@ struct Move {
     bool pawn_double_push;
 
 
-    Move() {
-        is_promotion = false;
-        en_passant = false;
-        castling = false;
-        capture = false;
-        check = false;
-        half_move = false;
-        illegal_move = false;
-        pawn_double_push = false;
-    }
+    Move();
+    Move(
+        Color color,
+        PieceType piece_type,
+        Bitboard from,
+        Bitboard to,
+        PieceType promotion,
+        bool is_promotion,
+        bool en_passant,
+        bool castling,
+        bool capture,
+        bool check,
+        bool half_move,
+        bool illegal_move,
+        bool pawn_double_push
+    );
 
     std::string to_string();
 };
+
+Bitboard shift(Bitboard b, int8_t n, int8_t dir);
 
 const Bitboard FILE_A = 0x8080808080808080;
 const Bitboard FILE_B = 0x4040404040404040;
