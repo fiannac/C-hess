@@ -2,6 +2,7 @@
 #define MOVES_GENERATOR_H
 
 #include "chess_types.h"
+#include "game.h"
 #include <list>
 #include <iostream>
 #include <unordered_map>

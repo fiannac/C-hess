@@ -1,5 +1,6 @@
 #include "moves_generator.h"
 #include "chess_types.h"
+#include "game.h"
 #include <iostream>
 #include <unordered_map>
 #include <vector>

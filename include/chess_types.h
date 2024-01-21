@@ -64,27 +64,6 @@ struct Move {
     std::string to_string();
 };
 
-
-struct Game {
-    Bitboard pieces[COLOR_NB][PIECE_TYPE_NB];
-    Bitboard occupied[COLOR_NB];
-    Bitboard all;
-    Color turn;
-    Bitboard en_passant;
-    bool en_passant_possible;
-    int halfmove_clock;
-    int fullmove_number;
-    bool white_can_castle_kingside;
-    bool white_can_castle_queenside;
-    bool black_can_castle_kingside;
-    bool black_can_castle_queenside;
-
-    Game(std::string s);
-    void make_move(const Move& move);
-    std::string to_string();
-};
-
-
 const Bitboard FILE_A = 0x8080808080808080;
 const Bitboard FILE_B = 0x4040404040404040;
 const Bitboard FILE_C = 0x2020202020202020;

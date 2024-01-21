@@ -1,4 +1,5 @@
 #include "chess_types.h"
+#include "game.h"
 #include "moves_generator.h"
 #include <list>
 #include <iostream>
