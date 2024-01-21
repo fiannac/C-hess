@@ -71,6 +71,8 @@ struct Move {
 };
 
 Bitboard shift(Bitboard b, int8_t n, int8_t dir);
+uint32_t getBitIndex(Bitboard);
+
 
 const Bitboard FILE_A = 0x8080808080808080;
 const Bitboard FILE_B = 0x4040404040404040;

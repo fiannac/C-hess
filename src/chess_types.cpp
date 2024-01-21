@@ -50,3 +50,15 @@ Bitboard shift(Bitboard b, int8_t n, int8_t dir){
         return b >> n;
     }
 }
+
+
+u_int32_t getBitIndex(Bitboard bitboard){
+    if(bitboard == 0)
+        return -1;
+    int index = 0;
+    while(bitboard != 1ULL){
+        bitboard = bitboard >> 1;
+        index++;
+    }
+    return index;
+}

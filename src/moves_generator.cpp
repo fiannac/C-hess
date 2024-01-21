@@ -5,16 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-int getBitIndex(Bitboard bitboard){
-    if(bitboard == 0)
-        return -1;
-    int index = 0;
-    while(bitboard != 1ULL){
-        bitboard = bitboard >> 1;
-        index++;
-    }
-    return index;
-}
 
 inline void setBit(Bitboard &bitboard, int index){
     bitboard = bitboard | (1ULL << index);
@@ -66,22 +56,6 @@ MovesGenerator::MovesGenerator(){
 
     setRookMagicBitboard();
     setBishopMagicBitboard();
-}
-
-void MovesGenerator::inizializeKnightPatterns(){
-    Bitboard index = 1ULL;
-    for(int i=0;i<64;i++){
-        KNIGHT_PATTERNS[i] = 
-            (index & ~FILE_H) >> 17 |
-            (index & ~(FILE_G | FILE_H)) >> 10 |
-            (index & ~(FILE_G | FILE_H)) << 6 |
-            (index & ~FILE_H) << 15 | 
-            (index & ~FILE_A) >> 15 |
-            (index & ~(FILE_A | FILE_B)) >> 6 | 
-            (index & ~(FILE_A | FILE_B)) << 10 |
-            (index & ~FILE_A) << 17;
-        index <<= 1;
-    }
 }
 
 void MovesGenerator::inizializeKingPatterns(){
@@ -168,63 +142,6 @@ void MovesGenerator::inizializeBishopMasks(){
             index = index >> 9;
         }
         BISHOP_MASKS[i] = mask & NOT(indexCopy) & NOT(FILE_A) & NOT(FILE_H) & NOT(RANK_1) & NOT(RANK_8);
-    }
-}
-
-void MovesGenerator::generateKnightMoves(const Game& game, std::list<Move> &moves){
-    
-    if(game.turn == WHITE){
-        Bitboard white_knights = game.pieces[WHITE][KNIGHT];
-        while(white_knights){
-            
-            Bitboard white_knight = white_knights & -white_knights;
-            Bitboard white_knight_moves = this->KNIGHT_PATTERNS[getBitIndex(white_knight)] & ~game.occupied[WHITE];
-            while(white_knight_moves){
-                Move move;
-                move.color = WHITE;
-                move.piece_type = KNIGHT;
-                move.to = white_knight_moves & -white_knight_moves;
-                move.from = white_knight;
-                move.capture = game.occupied[BLACK] & move.to;
-                move.en_passant = false;
-                move.castling = false;
-                move.is_promotion = false;
-                move.check = false;
-
-                if(isLegalMove(game, move)){
-                    moves.push_back(move);
-                }
-
-                white_knight_moves &= white_knight_moves - 1;
-            }
-            white_knights &= white_knights - 1;
-        }
-    } else if(game.turn == BLACK){
-        Bitboard black_knights = game.pieces[BLACK][KNIGHT];
-
-        while(black_knights){
-            Bitboard black_knight = black_knights & -black_knights;
-            Bitboard black_knight_moves = this->KNIGHT_PATTERNS[getBitIndex(black_knight)] & ~game.occupied[BLACK];
-
-            while(black_knight_moves){
-                Move move;
-                move.color = BLACK;
-                move.piece_type = KNIGHT;
-                move.to = black_knight_moves & -black_knight_moves;
-                move.from = black_knight;
-                move.capture = game.occupied[WHITE] & move.to;
-                move.en_passant = false;
-                move.castling = false;
-                move.is_promotion = false;
-
-                if(isLegalMove(game, move)){
-                    moves.push_back(move);
-                }
-
-                black_knight_moves &= black_knight_moves - 1;
-            }
-            black_knights &= black_knights - 1;
-        }
     }
 }
 
