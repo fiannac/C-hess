@@ -49,8 +49,8 @@ std::list<Move> MovesGenerator::generateMoves(const Game& game){
 }
 
 MovesGenerator::MovesGenerator(){
-    inizializeKnightPatterns();
-    inizializeKingPatterns();
+    inizializeKnightMasks();
+    inizializeKingMasks();
     inizializeRookMasks();
     inizializeBishopMasks();
 

@@ -9,8 +9,8 @@
 
 class MovesGenerator {
 private:
-    Bitboard KNIGHT_PATTERNS[64];
-    Bitboard KING_PATTERNS[64];
+    Bitboard KNIGHT_MASKS[64];
+    Bitboard KING_MASKS[64];
 
     Bitboard ROOK_MASKS[64];
     Bitboard BISHOP_MASKS[64];
@@ -32,8 +32,8 @@ private:
     void generateKingMoves(const Game& game, std::list<Move> &moves);
     bool isLegalMove(const Game& game, Move move);
 
-    void inizializeKnightPatterns();
-    void inizializeKingPatterns();
+    void inizializeKnightMasks();
+    void inizializeKingMasks();
     void inizializeRookMasks();
     void inizializeBishopMasks();
 
