@@ -3,15 +3,23 @@
 #include "moves_generator.h"
 #include <list>
 #include <iostream>
-#include <string>
+#include <string.h>
 
-int main(){
-    Game game("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1");
+#define DEFAULT_BOARD "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
+
+int main(int argc, char** argv){
+    char* board = nullptr;
+    if (argc == 1){
+        board = new char[strlen(DEFAULT_BOARD) + 1];
+        strcpy(board, DEFAULT_BOARD);
+    } else {
+        board = argv[1];
+    }
+    Game game(board);
     std::cout << game.to_string() << std::endl;
     MovesGenerator moves_generator;
 
-    for(int i=0;i<10;i++){
-        
+    while(1){
         std::list<Move> moves = moves_generator.generateMoves(game);
     
         int num = 0;
@@ -20,7 +28,7 @@ int main(){
             num++;
         }
         int to_do;
-        std::cout << "Inserisci mossa: ";
+        std::cout << "Move (index): ";
         std::cin >> to_do;
         std::cout << std::endl;
         auto pointer = moves.begin();
@@ -30,6 +38,5 @@ int main(){
         std::cout << game.to_string() << std::endl;
     }
 
-    while(1);
     return 0;
 }

@@ -1,6 +1,7 @@
 #include "game.h"
 #include <string>
 #include <iostream>
+#include <sstream>
 
 
 Game::Game(std::string fen) {
@@ -225,94 +226,54 @@ void Game::make_move(const Move& move) {
 
 std::string Game::to_string() {
     Bitboard pos = 0x8000000000000000;
-    int i = 0;
-    std::string s = "";
+    std::stringstream board;
 
-    while(pos){
-        if(i % 8 == 0 && i != 0){
-            s.append("\n");
+    int rank = 8;
+    int file = 0;
+
+    board << "+===+===+===+===+===+===+===+===+\n";
+
+    while (pos) {
+        if (file % 8 == 0) {
+            if (file != 0) {
+                board << " " << rank << "\n";
+                board << "+---+---+---+---+---+---+---+---+\n";
+                rank--;
+            }
+            board << "║";
         }
 
-        if(pos & this->pieces[WHITE][PAWN]){
-            s.append("P");
-        } else if(pos & this->pieces[WHITE][KNIGHT]){
-            s.append("N");
-        } else if(pos & this->pieces[WHITE][BISHOP]){
-            s.append("B");
-        } else if(pos & this->pieces[WHITE][ROOK]){
-            s.append("R");
-        } else if(pos & this->pieces[WHITE][QUEEN]){
-            s.append("Q");
-        } else if(pos & this->pieces[WHITE][KING]){
-            s.append("K");
-        } else if(pos & this->pieces[BLACK][PAWN]){
-            s.append("p");
-        } else if(pos & this->pieces[BLACK][KNIGHT]){
-            s.append("n");
-        } else if(pos & this->pieces[BLACK][BISHOP]){
-            s.append("b");
-        } else if(pos & this->pieces[BLACK][ROOK]){
-            s.append("r");
-        } else if(pos & this->pieces[BLACK][QUEEN]){
-            s.append("q");
-        } else if(pos & this->pieces[BLACK][KING]){
-            s.append("k");
-        } else {
-            s.append("-");
-        }
+        // Append the piece or a dash, followed by a space
+        if (pos & this->pieces[WHITE][PAWN]) board << " P ";
+        else if (pos & this->pieces[WHITE][KNIGHT]) board << " N ";
+        else if (pos & this->pieces[WHITE][BISHOP]) board << " B ";
+        else if (pos & this->pieces[WHITE][ROOK]) board << " R ";
+        else if (pos & this->pieces[WHITE][QUEEN]) board << " Q ";
+        else if (pos & this->pieces[WHITE][KING]) board << " K ";
+        else if (pos & this->pieces[BLACK][PAWN]) board << " p ";
+        else if (pos & this->pieces[BLACK][KNIGHT]) board << " n ";
+        else if (pos & this->pieces[BLACK][BISHOP]) board << " b ";
+        else if (pos & this->pieces[BLACK][ROOK]) board << " r ";
+        else if (pos & this->pieces[BLACK][QUEEN]) board << " q ";
+        else if (pos & this->pieces[BLACK][KING]) board << " k ";
+        else board << "   ";
 
-        pos = pos >> 1;
-        i++;
+        if((file + 1) % 8) board << "|";
+        else board << "║";
 
-        
+        pos >>= 1;
+        file++;
     }
 
-    return s;
+    board << " " << rank << "\n";
+    board << "+===+===+===+===+===+===+===+===+\n";
+    board << "  a   b   c   d   e   f   g   h \n";
+    return board.str();
 }
+
 
 std::string Move::to_string() {
     std::string move_string = "";
-    
-    //from square
-    /*
-    if(this->from & FILE_A){
-        move_string.append("a");
-    } else if(this->from & FILE_B){
-        move_string.append("b");
-    } else if(this->from & FILE_C){
-        move_string.append("c");
-    } else if(this->from & FILE_D){
-        move_string.append("d");
-    } else if(this->from & FILE_E){
-        move_string.append("e");
-    } else if(this->from & FILE_F){
-        move_string.append("f");
-    } else if(this->from & FILE_G){
-        move_string.append("g");
-    } else if(this->from & FILE_H){
-        move_string.append("h");
-    }
-
-    if(this->from & RANK_1){
-        move_string.append("1");
-    } else if(this->from & RANK_2){
-        move_string.append("2");
-    } else if(this->from & RANK_3){
-        move_string.append("3");
-    } else if(this->from & RANK_4){
-        move_string.append("4");
-    } else if(this->from & RANK_5){
-        move_string.append("5");
-    } else if(this->from & RANK_6){
-        move_string.append("6");
-    } else if(this->from & RANK_7){
-        move_string.append("7");
-    } else if(this->from & RANK_8){
-        move_string.append("8");
-    }
-
-    move_string += "-";
-    */    
 
    if(castling){
     if(to == 1ULL << G1 || to == 1ULL << G8){
