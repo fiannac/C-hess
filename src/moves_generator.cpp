@@ -58,22 +58,6 @@ MovesGenerator::MovesGenerator(){
     setBishopMagicBitboard();
 }
 
-void MovesGenerator::inizializeKingPatterns(){
-    Bitboard index = 1ULL;
-    for(int i=0;i<64;i++){
-        KING_PATTERNS[i] = 
-            (index & ~FILE_H) >> 1 |
-            (index & ~FILE_H) >> 9 |
-            (index & ~RANK_1) >> 8 |
-            (index & ~FILE_A) >> 7 |
-            (index & ~FILE_A) << 1 |
-            (index & ~FILE_A) << 9 |
-            (index & ~RANK_8) << 8 |
-            (index & ~FILE_H) << 7;
-        index <<= 1;
-    }
-}
-
 void MovesGenerator::inizializeRookMasks(){
     Bitboard files[8];
     Bitboard ranks[8];
@@ -142,113 +126,6 @@ void MovesGenerator::inizializeBishopMasks(){
             index = index >> 9;
         }
         BISHOP_MASKS[i] = mask & NOT(indexCopy) & NOT(FILE_A) & NOT(FILE_H) & NOT(RANK_1) & NOT(RANK_8);
-    }
-}
-
-void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves){
-        if(game.turn == WHITE){
-        Bitboard white_king = game.pieces[WHITE][KING];
-        Bitboard white_king_moves = this->KING_PATTERNS[getBitIndex(white_king)] & ~game.occupied[WHITE];
-        while(white_king_moves){
-            Move move;
-            move.color = WHITE;
-            move.piece_type = KING;
-            move.to = white_king_moves & -white_king_moves;
-            move.from = white_king;
-            move.capture = game.occupied[BLACK] & move.to;
-            move.en_passant = false;
-            move.castling = false;
-            move.is_promotion = false;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-            white_king_moves &= white_king_moves - 1;
-        }
-
-        if(game.white_can_castle_kingside && (game.all & (1ULL << F1 | 1ULL << G1)) == 0ULL){
-            Move move;
-            move.color = WHITE;
-            move.piece_type = KING;
-            move.to = 1ULL << G1;
-            move.from = 1ULL << E1;
-            move.capture = false;
-            move.en_passant = false;
-            move.castling = true;
-            move.is_promotion = false;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-        } 
-
-        if(game.white_can_castle_queenside && (game.all & (1ULL << B1 | 1ULL << C1 | 1ULL << D1)) == 0ULL){
-            Move move;
-            move.color = WHITE;
-            move.piece_type = KING;
-            move.to = 1ULL << C1;
-            move.from = 1ULL << E1;
-            move.capture = false;
-            move.en_passant = false;
-            move.castling = true;
-            move.is_promotion = false;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-        }
-
-    } else if(game.turn == BLACK){
-        Bitboard black_king = game.pieces[BLACK][KING];
-        Bitboard black_king_moves = this->KING_PATTERNS[getBitIndex(black_king)] & ~game.occupied[BLACK];
-        while(black_king_moves){
-            Move move;
-            move.color = BLACK;
-            move.piece_type = KING;
-            move.to = black_king_moves & -black_king_moves;
-            move.from = black_king;
-            move.capture = game.occupied[WHITE] & move.to;
-            move.en_passant = false;
-            move.castling = false;
-            move.is_promotion = false;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-            black_king_moves &= black_king_moves - 1;
-        }
-
-        if(game.black_can_castle_kingside && (game.all & (1ULL << F8 | 1ULL << G8)) == 0ULL){
-            Move move;
-            move.color = BLACK;
-            move.piece_type = KING;
-            move.to = 1ULL << G8;
-            move.from = 1ULL << E8;
-            move.capture = false;
-            move.en_passant = false;
-            move.castling = true;
-            move.is_promotion = false;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-        }
-
-        if(game.black_can_castle_queenside && (game.all & (1ULL << B8 | 1ULL << C8 | 1ULL << D8)) == 0ULL){
-            Move move;
-            move.color = BLACK;
-            move.piece_type = KING;
-            move.to = 1ULL << C8;
-            move.from = 1ULL << E8;
-            move.capture = false;
-            move.en_passant = false;
-            move.castling = true;
-            move.is_promotion = false;
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
-        }
     }
 }
 
