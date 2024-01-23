@@ -4,7 +4,7 @@
 void MovesGenerator::inizializeKingMasks(){
     Bitboard index = 1ULL;
     for(int i=0;i<64;i++){
-        KING_MASKS[i] = 
+        king_masks[i] = 
             (index & ~FILE_H) >> 1 |
             (index & ~FILE_H) >> 9 |
             (index & ~RANK_1) >> 8 |
@@ -23,7 +23,7 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
     Color opponent_player = white_playing ? BLACK : WHITE;
     
     Bitboard king = game.pieces[turn_player][KING];
-    Bitboard king_moves = this->KING_MASKS[getBitIndex(king)] & ~game.occupied[turn_player];
+    Bitboard king_moves = this->king_masks[getBitIndex(king)] & ~game.occupied[turn_player];
 
     while(king_moves){
         Move move;

@@ -4,7 +4,7 @@
 void MovesGenerator::inizializeKnightMasks(){
     Bitboard index = 1ULL;
     for(int i=0;i<64;i++){
-        KNIGHT_MASKS[i] = 
+        knight_masks[i] = 
             (index & ~FILE_H) >> 17 |
             (index & ~(FILE_G | FILE_H)) >> 10 |
             (index & ~(FILE_G | FILE_H)) << 6 |
@@ -25,7 +25,7 @@ void MovesGenerator::generateKnightMoves(const Game& game, std::list<Move> &move
     while(knights){
 
         Bitboard knight = knights & -knights;
-        Bitboard knight_moves = KNIGHT_MASKS[getBitIndex(knight)] & ~game.occupied[turn_player];
+        Bitboard knight_moves = knight_masks[getBitIndex(knight)] & ~game.occupied[turn_player];
 
         while(knight_moves){
             Move move;

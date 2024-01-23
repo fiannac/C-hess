@@ -9,20 +9,20 @@
 
 class MovesGenerator {
 private:
-    Bitboard KNIGHT_MASKS[64];
-    Bitboard KING_MASKS[64];
+    Bitboard knight_masks[64];
+    Bitboard king_masks[64];
 
-    Bitboard ROOK_MASKS[64];
-    Bitboard BISHOP_MASKS[64];
+    Bitboard rook_masks[64];
+    Bitboard bishop_masks[64];
 
-    Bitboard ROOK_MAGIC_NUMBERS[64];
+    Bitboard rook_magic_numbers[64];
     Bitboard**  rookDB;
+    uint8_t rook_db_digits;
 
-    Bitboard BISHOP_MAGIC_NUMBERS[64];
+    Bitboard bishop_magic_numbers[64];
     Bitboard** bishopDB;
+    uint8_t bishop_db_digits;
 
-    int ROOK_SHIFT_BITS;
-    int BISHOP_SHIFT_BITS;
     //change to const &
     void generatePawnMoves(const Game& game, std::list<Move> &moves);
     void generateKnightMoves(const Game& game, std::list<Move> &moves);

@@ -10,8 +10,8 @@ void MovesGenerator::generateQueenMoves(const Game& game, std::list<Move> &moves
         int index = getBitIndex(queens);
             
         Bitboard queen_moves = (
-            rookDB[index][magic_hash(game.all & ROOK_MASKS[index], ROOK_MAGIC_NUMBERS[index], 12)] |
-            bishopDB[index][magic_hash(game.all & BISHOP_MASKS[index], BISHOP_MAGIC_NUMBERS[index], 10)]
+            rookDB[index][magic_hash(game.all & rook_masks[index], rook_magic_numbers[index], rook_db_digits)] |
+            bishopDB[index][magic_hash(game.all & bishop_masks[index], bishop_magic_numbers[index], bishop_db_digits)]
         ) & ~game.occupied[turn_player];
 
         while(queen_moves){
