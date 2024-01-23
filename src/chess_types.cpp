@@ -62,3 +62,38 @@ u_int32_t getBitIndex(Bitboard bitboard){
     }
     return index;
 }
+
+
+Bitboard NOT(Bitboard bitboard){
+    return ~bitboard;
+}
+
+
+Bitboard randomU64(){
+    Bitboard random = 0;
+    for(int i = 0; i < 64; i++){
+        if(rand() % 2 == 0)
+            setBit(random, i);
+    }
+    return random;
+}
+
+
+void setBit(Bitboard &bitboard, int index){
+    bitboard = bitboard | (1ULL << index);
+}
+
+
+int countBits(Bitboard bb){
+    int count = 0;
+    while(bb){
+        count++;
+        bb &= bb - 1;
+    }
+    return count;
+}
+
+
+Bitboard magicHash(Bitboard bb, uint16_t magic, int shift){
+    return (bb * magic) >> (64-shift);
+}

@@ -72,6 +72,11 @@ struct Move {
 
 Bitboard shift(Bitboard b, int8_t n, int8_t dir);
 uint32_t getBitIndex(Bitboard);
+Bitboard NOT(Bitboard bitboard);
+Bitboard randomU64();
+void setBit(Bitboard &bitboard, int index);
+int countBits(Bitboard);
+Bitboard magicHash(Bitboard bb, uint16_t magic, int shift);
 
 
 const Bitboard FILE_A = 0x8080808080808080;
