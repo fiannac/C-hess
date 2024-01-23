@@ -4,8 +4,39 @@
 #include <list>
 #include <iostream>
 #include <string.h>
+#include <string>
+
 
 #define DEFAULT_BOARD "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
+
+
+void game_turn(Game& game, MovesGenerator& moves_generator){
+    std::list<Move> moves = moves_generator.generateMoves(game);
+    
+    for (auto move : moves) {
+        std::cout << move.to_string() << ", ";
+    }
+    std::cout << std::endl;
+
+    std::string move_str;
+    Move to_do;
+    bool valid_move = false;
+    do{
+        std::cout << "Move: ";
+        std::cin >> move_str;
+        std::cout << std::endl;
+
+        for(auto move: moves){ 
+            if(move_str == move.to_string()){
+                to_do = move;
+                valid_move = true;
+            }
+        }
+    } while(!valid_move);
+
+    game.make_move(to_do);
+}
+
 
 int main(int argc, char** argv){
     char* board = nullptr;
@@ -15,27 +46,12 @@ int main(int argc, char** argv){
     } else {
         board = argv[1];
     }
-    Game game(board);
-    std::cout << game.to_string() << std::endl;
     MovesGenerator moves_generator;
+    Game game(board);
 
     while(1){
-        std::list<Move> moves = moves_generator.generateMoves(game);
-    
-        int num = 0;
-        for (Move move : moves) {
-            std::cout << num << ") " << move.to_string() << std::endl;
-            num++;
-        }
-        int to_do;
-        std::cout << "Move (index): ";
-        std::cin >> to_do;
-        std::cout << std::endl;
-        auto pointer = moves.begin();
-        std::advance(pointer, to_do);
-        game.make_move(*pointer);
-        std::cout << "Move made: " << (*moves.begin()).to_string() << std::endl;
         std::cout << game.to_string() << std::endl;
+        game_turn(game, moves_generator);
     }
 
     return 0;
