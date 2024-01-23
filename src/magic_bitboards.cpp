@@ -54,7 +54,7 @@ bool is_magic(uint64_t candidate, const std::vector<Bitboard>& indexes, const st
 }
 
 void setup_magic_db(Bitboard** db, int row, uint64_t magic_number, const std::vector<Bitboard>& indexes, const std::vector<Bitboard>& outputs, uint8_t digits){
-    for(int i=0; i<indexes.size(); i++){
+    for(size_t i=0; i<indexes.size(); i++){
         db[row][magic_hash(indexes[i], magic_number, digits)] = outputs[i];
     }
     return;

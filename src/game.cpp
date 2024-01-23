@@ -6,7 +6,7 @@
 
 Game::Game(std::string fen) {
     Bitboard pos = 0x8000000000000000;
-    int i = 0;
+    size_t i = 0;
 
     // Initialize all bitboards to 0
     for (int color = 0; color < 2; color++) {
@@ -32,7 +32,7 @@ Game::Game(std::string fen) {
         }
         else {
             Color color = (c >= 'a' && c <= 'z') ? BLACK : WHITE;
-            PieceType piece_type;
+            PieceType piece_type = PIECE_TYPE_NB;
             switch (c) {
             case 'P':
             case 'p':

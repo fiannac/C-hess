@@ -1,5 +1,5 @@
 CC = g++
-FLAGS = -std=c++11 -Wall
+FLAGS = -std=c++11 -Wall -O3
 
 # Directories
 SRC_DIR = src
