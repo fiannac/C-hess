@@ -116,9 +116,6 @@ void MovesGenerator::generateBishopMoves(const Game& game, std::list<Move> &move
             move.to = bishop_moves & -bishop_moves;
             move.from = bishop;
             move.capture = game.occupied[opponent_player] & move.to;
-            move.en_passant = false;
-            move.castling = false;
-            move.is_promotion = false;
 
             if(isLegalMove(game, move)){
                 moves.push_back(move);

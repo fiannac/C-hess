@@ -24,21 +24,14 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
     for(int block=0; block<64; block++){
         if(move_mask & pawns_steps){
             Bitboard destination = move_mask & pawns_steps;
-            Move move(
-                turn_player,
-                PAWN,
-                shift(destination, 8, -1*dir),
-                destination,
-                QUEEN,  // TODO: Manage multiple possible promotions
-                destination & promotion_rank,
-                false,
-                false,
-                false,  // TODO: check not implemented
-                false,
-                false,
-                false,
-                false
-            );
+            
+            Move move;
+            move.color = turn_player;
+            move.piece_type = PAWN;
+            move.to = destination;
+            move.from = shift(destination, 8, -1*dir);
+            move.is_promotion = destination & promotion_rank;
+            move.promotion = QUEEN;
 
             if(isLegalMove(game, move)){
                 moves.push_back(move);
@@ -48,21 +41,11 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
         if(move_mask & pawns_double_steps){
             Bitboard destination = move_mask & pawns_double_steps;
             
-            Move move(
-                turn_player,
-                PAWN,
-                shift(destination, 16, -1*dir),
-                destination,
-                PIECE_TYPE_NB,
-                false,
-                false,
-                false,
-                false,  // TODO: check not implemented
-                false,
-                false,
-                false,
-                false
-            );
+            Move move;
+            move.color = turn_player;
+            move.piece_type = PAWN;
+            move.to = destination;
+            move.from = shift(destination, 16, -1*dir);
 
             if(isLegalMove(game, move)){
                 moves.push_back(move);
@@ -72,21 +55,14 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
         if(move_mask & pawns_attacks_left){
             Bitboard destination = move_mask & pawns_attacks_left;
             
-            Move move(
-                turn_player,
-                PAWN,
-                shift(destination, attack_left_shift, -1*dir),
-                destination,
-                QUEEN,  // TODO: Manage multiple possible promotions
-                destination & promotion_rank,
-                false,
-                false,
-                true,
-                false,
-                false,
-                false,
-                false
-            );
+            Move move;
+            move.color = turn_player;
+            move.piece_type = PAWN;
+            move.to = destination;
+            move.from = shift(destination, attack_left_shift, -1*dir);            
+            move.capture = true;
+            move.is_promotion = destination & promotion_rank;
+            move.promotion = QUEEN;
 
             if(isLegalMove(game, move)){
                 moves.push_back(move);
@@ -96,21 +72,14 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
         if(move_mask & pawns_attacks_right){
             Bitboard destination = move_mask & pawns_attacks_right;
 
-            Move move(
-                turn_player,
-                PAWN,
-                shift(destination, attack_right_shift, -1*dir),
-                destination,
-                QUEEN,  // TODO: Manage multiple possible promotions
-                destination & promotion_rank,
-                false,
-                false,
-                true,
-                false,
-                false,
-                false,
-                false
-            );
+            Move move;
+            move.color = turn_player;
+            move.piece_type = PAWN;
+            move.to = destination;
+            move.from = shift(destination, attack_right_shift, -1*dir);
+            move.capture = true;
+            move.is_promotion = destination & promotion_rank;
+            move.promotion = QUEEN;
 
             if(isLegalMove(game, move)){
                 moves.push_back(move);
@@ -118,51 +87,11 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
         }
 
         if(move_mask & pawns_en_passant_left){
-            Bitboard destination = move_mask & pawns_en_passant_left;
-
-            Move move(
-                turn_player,
-                PAWN,
-                shift(destination, 7, -1*dir),
-                destination,
-                QUEEN,  // TODO: Manage multiple possible promotions
-                destination & promotion_rank,
-                false,
-                true,
-                true,
-                false,
-                false,
-                false,
-                false
-            );
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
+            // TODO
         }
 
         if(move_mask & pawns_en_passant_right){
-            Bitboard destination = move_mask & pawns_en_passant_right;
-
-            Move move(
-                turn_player,
-                PAWN,
-                shift(destination, 9, -1*dir),
-                destination,
-                QUEEN,  // TODO: Manage multiple possible promotions
-                move.to & promotion_rank,
-                false,
-                true,
-                true,
-                false,
-                false,
-                false,
-                false
-            );
-
-            if(isLegalMove(game, move)){
-                moves.push_back(move);
-            }
+            // TODO
         }
 
         move_mask <<= 1ULL;

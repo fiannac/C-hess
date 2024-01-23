@@ -44,29 +44,11 @@ struct Move {
     bool en_passant;
     bool castling;
     bool capture;
-    bool check;
+    bool check;  // Unused.
     bool half_move;
-    bool illegal_move;
     bool pawn_double_push;
 
-
     Move();
-    Move(
-        Color color,
-        PieceType piece_type,
-        Bitboard from,
-        Bitboard to,
-        PieceType promotion,
-        bool is_promotion,
-        bool en_passant,
-        bool castling,
-        bool capture,
-        bool check,
-        bool half_move,
-        bool illegal_move,
-        bool pawn_double_push
-    );
-
     std::string to_string();
 };
 

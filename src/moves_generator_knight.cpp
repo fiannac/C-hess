@@ -34,10 +34,6 @@ void MovesGenerator::generateKnightMoves(const Game& game, std::list<Move> &move
             move.to = knight_moves & -knight_moves;
             move.from = knight;
             move.capture = game.occupied[opponent_player] & move.to;
-            move.en_passant = false;
-            move.castling = false;
-            move.is_promotion = false;
-            move.check = false;
 
             if(isLegalMove(game, move)){
                 moves.push_back(move);

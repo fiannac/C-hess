@@ -32,9 +32,6 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
         move.to = king_moves & -king_moves;
         move.from = king;
         move.capture = game.occupied[opponent_player] & move.to;
-        move.en_passant = false;
-        move.castling = false;
-        move.is_promotion = false;
 
         if(isLegalMove(game, move)){
             moves.push_back(move);
@@ -75,10 +72,7 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
         move.piece_type = KING;
         move.to = move_to_left;
         move.from = king_square;
-        move.capture = false;
-        move.en_passant = false;
         move.castling = true;
-        move.is_promotion = false;
 
         if(isLegalMove(game, move)){
             moves.push_back(move);
@@ -96,10 +90,7 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
         move.piece_type = KING;
         move.to = move_to_right;
         move.from = king_square;
-        move.capture = false;
-        move.en_passant = false;
         move.castling = true;
-        move.is_promotion = false;
 
         if(isLegalMove(game, move)){
             moves.push_back(move);

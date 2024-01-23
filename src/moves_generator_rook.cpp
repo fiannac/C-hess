@@ -124,9 +124,6 @@ void MovesGenerator::generateRookMoves(const Game& game, std::list<Move> &moves)
             move.to = rook_moves & -rook_moves;
             move.from = rook;
             move.capture = game.occupied[opponent_player] & move.to;
-            move.en_passant = false;
-            move.castling = false;
-            move.is_promotion = false;
 
             if(isLegalMove(game, move)){
                 moves.push_back(move);
