@@ -16,8 +16,8 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
     Bitboard pawns_double_steps = shift(pawns_steps & double_step_rank, 8, dir) & ~game.all;
     Bitboard pawns_attacks_left = shift(pawns & ~FILE_H, attack_left_shift, dir) & game.occupied[opponent_player];
     Bitboard pawns_attacks_right = shift(pawns & ~FILE_A, attack_right_shift, dir) & game.occupied[opponent_player];
-    Bitboard pawns_en_passant_left = shift(pawns & ~FILE_H, 7, dir) & game.en_passant;
-    Bitboard pawns_en_passant_right = shift(pawns & ~FILE_A, 9, dir) & game.en_passant;
+    Bitboard pawns_en_passant_left = shift(pawns & ~FILE_H, attack_left_shift, dir) & game.en_passant;
+    Bitboard pawns_en_passant_right = shift(pawns & ~FILE_A, attack_right_shift, dir) & game.en_passant;
 
     Bitboard move_mask = 1ULL;
 
@@ -46,6 +46,7 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
             move.piece_type = PAWN;
             move.to = destination;
             move.from = shift(destination, 16, -1*dir);
+            move.pawn_double_push = true;
 
             if(isLegalMove(game, move)){
                 moves.push_back(move);
@@ -87,11 +88,35 @@ void MovesGenerator::generatePawnMoves(const Game& game, std::list<Move> &moves)
         }
 
         if(move_mask & pawns_en_passant_left){
-            // TODO
+            Bitboard destination = move_mask & pawns_en_passant_left;
+
+            Move move;
+            move.color = turn_player;
+            move.piece_type = PAWN;
+            move.to = destination;
+            move.from = shift(destination, attack_left_shift, -1*dir);
+            move.capture = true;
+            move.en_passant = true;
+            
+            if(isLegalMove(game, move)){
+                moves.push_back(move);
+            }
         }
 
         if(move_mask & pawns_en_passant_right){
-            // TODO
+            Bitboard destination = move_mask & pawns_en_passant_right;
+
+            Move move;
+            move.color = turn_player;
+            move.piece_type = PAWN;
+            move.to = destination;
+            move.from = shift(destination, attack_right_shift, -1*dir);
+            move.capture = true;
+            move.en_passant = true;
+            
+            if(isLegalMove(game, move)){
+                moves.push_back(move);
+            }
         }
 
         move_mask <<= 1ULL;
