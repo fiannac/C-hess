@@ -76,8 +76,8 @@ std::vector<Bitboard> generate_bishop_movements(const std::vector<Bitboard>& blo
 
 
 void MovesGenerator::setBishopMagicBitboard(){
-    rook_db_digits = 10;
-    bishopDB = alloc_bitboard_matrix(64, 1ULL << rook_db_digits);
+    bishop_db_digits = 10;
+    bishopDB = alloc_bitboard_matrix(64, 1ULL << bishop_db_digits);
     uint64_t candidate;
 
     for(int i = 0; i<64; i++){
@@ -86,9 +86,9 @@ void MovesGenerator::setBishopMagicBitboard(){
         std::vector<Bitboard> movements = generate_bishop_movements(blockers, i);
         while(!found_magic){
             candidate = randomU64() & randomU64() & randomU64();
-            if(is_magic(candidate, blockers, movements, rook_db_digits)){
+            if(is_magic(candidate, blockers, movements, bishop_db_digits)){
                 bishop_magic_numbers[i] = candidate;
-                setup_magic_db(bishopDB, i, candidate, blockers, movements, rook_db_digits);
+                setup_magic_db(bishopDB, i, candidate, blockers, movements, bishop_db_digits);
                 found_magic = true;
             }
         }
@@ -106,7 +106,7 @@ void MovesGenerator::generateBishopMoves(const Game& game, std::list<Move> &move
         int index = getBitIndex(bishop);
 
         Bitboard bishop_moves = bishopDB[index][
-            magic_hash(game.all & bishop_masks[index], bishop_magic_numbers[index], rook_db_digits)
+            magic_hash(game.all & bishop_masks[index], bishop_magic_numbers[index], bishop_db_digits)
         ] & ~game.occupied[turn_player];
 
         while(bishop_moves){
