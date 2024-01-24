@@ -23,6 +23,10 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
     Color opponent_player = white_playing ? BLACK : WHITE;
     
     Bitboard king = game.pieces[turn_player][KING];
+    // Avoid segfault if no king is on the board.
+    if (king == 0ULL){
+        return;
+    }
     Bitboard king_moves = this->king_masks[getBitIndex(king)] & ~game.occupied[turn_player];
 
     while(king_moves){
@@ -58,7 +62,6 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
 
     bool can_castle_left = white_playing ? game.white_can_castle_queenside : game.black_can_castle_queenside;
     bool can_castle_right = white_playing ? game.white_can_castle_kingside : game.black_can_castle_kingside;
-
 
     if(
         can_castle_left &&
