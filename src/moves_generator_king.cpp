@@ -39,15 +39,14 @@ void MovesGenerator::generateKingMoves(const Game& game, std::list<Move> &moves)
         king_moves &= king_moves - 1;
     }
 
-    Bitboard king_square = white_playing ? 1ULL << E1 : 1ULL << E8;
-    Bitboard rook_left_square = white_playing ? 1ULL << A1 : 1ULL << A8;
-    Bitboard blocking_left = white_playing ? (1ULL << B1 | 1ULL << C1 | 1ULL << D1) : (1ULL << B8 | 1ULL << C8 | 1ULL << D8);
-    Bitboard rook_right_square = white_playing ? 1ULL << H1 : 1ULL << H8;
-    Bitboard blocking_right = white_playing ? (1ULL << F1 | 1ULL << G1) : (1ULL << F8 | 1ULL << G8);
+    Bitboard king_square = white_playing ? E1 : E8;
+    Bitboard rook_left_square = white_playing ? A1 : A8;
+    Bitboard blocking_left = white_playing ? (B1 | C1 | D1) : (B8 | C8 | D8);
+    Bitboard rook_right_square = white_playing ? H1 : H8;
+    Bitboard blocking_right = white_playing ? (F1 | G1) : (F8 | G8);
 
-
-    Bitboard move_to_left = white_playing ? 1ULL << C1 : 1ULL << C8;
-    Bitboard move_to_right = white_playing ? 1ULL << G1 : 1ULL << G8;
+    Bitboard move_to_left = white_playing ? C1 : C8;
+    Bitboard move_to_right = white_playing ? G1 : G8;
 
     bool king_in_place = (game.pieces[turn_player][KING] & king_square) != 0ULL;
     

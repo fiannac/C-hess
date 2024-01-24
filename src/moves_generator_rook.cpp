@@ -16,8 +16,8 @@ void MovesGenerator::inizializeRookMasks(){
 
     for(int i=0;i<8;i++){
         if(i==0){
-            files[i] = 0x8080808080808080ULL;
-            ranks[i] = 0xFFULL;
+            files[i] = FILE_A;
+            ranks[i] = RANK_1;
         } else {
             files[i] = files[i-1] >> 1;
             ranks[i] = ranks[i-1] << 8;

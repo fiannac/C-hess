@@ -65,8 +65,3 @@ int countBits(Bitboard bb){
     }
     return count;
 }
-
-
-Bitboard magicHash(Bitboard bb, uint16_t magic, int shift){
-    return (bb * magic) >> (64-shift);
-}

@@ -5,7 +5,7 @@
 
 
 Game::Game(std::string fen) {
-    Bitboard pos = 0x8000000000000000;
+    Bitboard pos = A8;
     size_t i = 0;
 
     // Initialize all bitboards to 0
@@ -89,15 +89,13 @@ Game::Game(std::string fen) {
         i++;
     }
     i++;
-    en_passant = 0;
-    en_passant_possible = false;
+    en_passant = 0ULL;
     if (fen[i] != '-') {
         int file = fen[i] - 'a';
         i++;
         int rank = fen[i] - '1';
         i++;
-        en_passant = 0x8000000000000000 >> (file + 8 * rank);
-        en_passant_possible = true;
+        en_passant = A8 >> (file + 8 * rank);
     }
     i++;
     halfmove_clock = 0;
@@ -168,25 +166,23 @@ void Game::make_move(const Move& move) {
         } else {
             en_passant = to << 8;
         }
-        en_passant_possible = true;
     } else {
-        en_passant = 0;
-        en_passant_possible = false;
+        en_passant = 0ULL;
     }
 
     if(move.castling){
-        if(to == 1ULL << G1){
-            pieces[WHITE][ROOK] &= ~(1ULL << H1);
-            pieces[WHITE][ROOK] |= 1ULL << F1;
-        } else if( to == 1ULL << C1){
-            pieces[WHITE][ROOK] &= ~(1ULL << A1);
-            pieces[WHITE][ROOK] |= 1ULL << D1;
-        } else if( to == 1ULL << G8){
-            pieces[BLACK][ROOK] &= ~(1ULL << H8);
-            pieces[BLACK][ROOK] |= 1ULL << F8;
-        } else if( to == 1ULL << C8){
-            pieces[BLACK][ROOK] &= ~(1ULL << A8);
-            pieces[BLACK][ROOK] |= 1ULL << D8;
+        if(to == G1){
+            pieces[WHITE][ROOK] &= ~H1;
+            pieces[WHITE][ROOK] |= F1;
+        } else if(to == C1){
+            pieces[WHITE][ROOK] &= ~A1;
+            pieces[WHITE][ROOK] |= D1;
+        } else if(to == G8){
+            pieces[BLACK][ROOK] &= ~H8;
+            pieces[BLACK][ROOK] |= F8;
+        } else if(to == C8){
+            pieces[BLACK][ROOK] &= ~A8;
+            pieces[BLACK][ROOK] |= D8;
         }
     }
 
@@ -200,15 +196,15 @@ void Game::make_move(const Move& move) {
         }
     } else if(move.piece_type == ROOK){
         if(piece_color == WHITE){
-            if(from == 1ULL << H1){
+            if(from == H1){
                 white_can_castle_kingside = false;
-            } else if(from == 1ULL << A1){
+            } else if(from == A1){
                 white_can_castle_queenside = false;
             }
         } else {
-            if(from == 1ULL << H8){
+            if(from == H8){
                 black_can_castle_kingside = false;
-            } else if(from == 1ULL << A8){
+            } else if(from == A8){
                 black_can_castle_queenside = false;
             }
         }
@@ -225,7 +221,7 @@ void Game::make_move(const Move& move) {
 }
 
 std::string Game::to_string() {
-    Bitboard pos = 0x8000000000000000;
+    Bitboard pos = A8;
     std::stringstream board;
 
     int rank = 8;
@@ -276,7 +272,7 @@ std::string Move::to_string() {
     std::string move_string = "";
 
    if(castling){
-    if(to == 1ULL << G1 || to == 1ULL << G8){
+    if(to == G1 || to == G8){
         move_string += "O-O";
     } else {
         move_string += "O-O-O";

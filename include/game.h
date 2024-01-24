@@ -9,7 +9,6 @@ struct Game {
     Bitboard all;
     Color turn;
     Bitboard en_passant;
-    bool en_passant_possible;
     int halfmove_clock;
     int fullmove_number;
     bool white_can_castle_kingside;
